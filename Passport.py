@@ -18,3 +18,23 @@ class Passport:
 
         self.types = {"i8": ir.IntType(8)}
         self.structs   = {}
+
+    def Get(self, target):
+        try:
+            return self.flags[target]
+        except:
+            return False
+
+    def Set(self, target) -> bool:
+        try:
+            self.flags[target] = True
+            return True
+        except:
+            return False
+        
+    def Unset(self, target) -> bool:
+        try:
+            self.flags[target] = False
+            return True
+        except:
+            return False

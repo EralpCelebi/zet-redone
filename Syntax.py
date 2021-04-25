@@ -1,11 +1,18 @@
 from sly import Lexer
 
 class Syntax(Lexer):
-    tokens = {"IDENTIFIER", "SEMICOLON"}
-    
+    tokens = {
+        "IDENTIFIER", "NUMBER",
+        "FN",
+    }
+
+    NUMBER = r"[0-9]+"
     IDENTIFIER = r"[_\w][_\w0-9]*"
-    SEMICOLON =  r"\;"
     
+    IDENTIFIER["fn"] = "FN"
+
+    literals = { '=', '+', '-', '*', '/', '(', ')', '{', '}', ';', '->' }
+
     ignore = r" \s+"
     ignore_comment = r'\#.*'
 

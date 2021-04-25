@@ -5,6 +5,8 @@ def Target(passport: Passport, value):
 
     if select == "Direct":
         return value.Get("value")
+    else:
+        raise Exception("Can't target this.")
 
 def Source(passport: Passport, value):
     select = value.Get("source")
@@ -13,5 +15,7 @@ def Source(passport: Passport, value):
         return value.Get("value")
 
     elif select == "Load":
-        return passport.builder.load(value)
+        return passport.builder.load(value.Get("value"))
     
+    else:
+        raise Exception("Can't source this.")

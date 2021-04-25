@@ -21,14 +21,19 @@ class Group:
         for element in self.elements:
             element.Build(passport)
 
-class Store:
+class Assign:
     def __init__(self, target, source):
         self.target = target
         self.source = source
     
     def Build(self, passport: Passport):
+        passport.Set("isTarget")
         self.target.Build(passport)
+        passport.Unset("isTarget")
+
+        passport.Set("isSource")
         self.source.Build(passport)
+        passport.Unset("isSource")
 
         passport.builder.store(
             Source(passport, passport.flags["source"]),
@@ -54,7 +59,45 @@ class Allocate:
             )
         })
 
+        passport.flags["needed"] = passport.flags["kind"]
         passport.flags["target"] = passport.variables[self.name]
+
+class Variable:
+    def __init__(self, name):
+        self.name = name
+
+    def Build(self, passport: Passport):
+        if passport.Get("isTarget"):
+            passport.flags["needed"] = passport.variables[self.name].Get("kind")
+            passport.flags["target"] = passport.variables[self.name]
+        
+        elif passport.Get("isSource"):
+            passport.flags["source"] = passport.variables[self.name]
+
+        else:
+            passport.flags["value"] = passport.variables[self.name]
+
+class Integer:
+    def __init__(self, value):
+        self.value = int(value)
+    
+    def Build(self, passport: Passport):
+        needed = Data({
+            "name": "i32",
+            "llvm": ir.IntType(32),
+            "depth": 0
+        })
+
+        if passport.Get("needed"):
+            needed = passport.Get("needed")
+        
+        passport.flags["source"] = Data({
+            "kind": needed,
+            "llvm": needed.Get("llvm"),
+            "source": "Load",
+            "target": "Direct",
+            "value": passport.builder.alloca(needed.Get("llvm"))
+        })
 
 class Kind:
     def __init__(self, kind):
